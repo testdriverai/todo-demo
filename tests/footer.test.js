@@ -5,7 +5,7 @@ describe("Todo Footer and Clear Completed", () => {
   it("should show items left counter and clear completed items", async (context) => {
     const testdriver = TestDriver(context);
 
-    await testdriver.provision.chrome({ url: "https://exceptional-vacancies-charts-britannica.trycloudflare.com" });
+    await testdriver.provision.chrome({ url: process.env.TEST_URL || "http://localhost:3000" });
 
     const assertEmpty = await testdriver.assert("the empty state message \"Nothing to do. Add your first todo above.\" is visible");
     expect(assertEmpty).toBeTruthy();
