@@ -1,0 +1,14 @@
+{
+  "name": "todo-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A small todo app used to demo TestDriver reviewing pull requests.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
