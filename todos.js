@@ -42,3 +42,15 @@ export function renameTodo(todos, id, title) {
   if (!trimmed) return removeTodo(todos, id);
   return todos.map((t) => (t.id === id ? { ...t, title: trimmed } : t));
 }
+
+export function toggleStar(todos, id) {
+  return todos.map((t) => (t.id === id ? { ...t, starred: !t.starred } : t));
+}
+
+// Starred todos float to the top; otherwise keep the order they were added.
+export function sortTodos(todos) {
+  return todos
+    .map((todo, index) => ({ todo, index }))
+    .sort((a, b) => Number(!!b.todo.starred) - Number(!!a.todo.starred) || a.index - b.index)
+    .map(({ todo }) => todo);
+}

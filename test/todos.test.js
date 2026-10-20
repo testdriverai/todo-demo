@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { addTodo, toggleTodo, removeTodo, filterTodos, countActive, clearCompleted, renameTodo } from '../todos.js';
+import { addTodo, toggleTodo, removeTodo, filterTodos, countActive, clearCompleted, renameTodo, toggleStar, sortTodos } from '../todos.js';
 
 test('addTodo appends a trimmed todo', () => {
   const todos = addTodo([], '  buy milk  ');
@@ -54,4 +54,17 @@ test('renameTodo updates the title, trimming whitespace', () => {
 test('renameTodo to a blank title deletes the todo', () => {
   const todos = addTodo([], 'a');
   assert.deepEqual(renameTodo(todos, todos[0].id, '  '), []);
+});
+
+test('toggleStar stars and unstars a todo', () => {
+  const todos = addTodo([], 'a');
+  const starred = toggleStar(todos, todos[0].id);
+  assert.equal(starred[0].starred, true);
+  assert.equal(toggleStar(starred, todos[0].id)[0].starred, false);
+});
+
+test('sortTodos puts starred todos first and keeps order otherwise', () => {
+  let todos = addTodo(addTodo(addTodo([], 'a'), 'b'), 'c');
+  todos = toggleStar(todos, todos[2].id);
+  assert.deepEqual(sortTodos(todos).map((t) => t.title), ['c', 'a', 'b']);
 });

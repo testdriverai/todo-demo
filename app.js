@@ -7,6 +7,8 @@ import {
   countActive,
   clearCompleted,
   renameTodo,
+  toggleStar,
+  sortTodos,
 } from './todos.js';
 
 const STORAGE_KEY = 'todo-demo:todos';
@@ -55,10 +57,17 @@ for (const button of filterButtons) {
   });
 }
 
-function update(next) {
+// Apply new state and re-render. If the control that triggered this had focus
+// (e.g. a keyboard user pressed Space on a star), put focus back on the same
+// control in the re-rendered row so they don't lose their place.
+function update(next, focusAfter) {
+  const shouldRefocus = focusAfter && document.activeElement?.matches(focusAfter.selector);
   todos = next;
   save(todos);
   render();
+  if (shouldRefocus) {
+    list.querySelector(`li[data-id="${CSS.escape(focusAfter.id)}"] ${focusAfter.selector}`)?.focus();
+  }
 }
 
 function render() {
@@ -69,7 +78,7 @@ function render() {
     button.setAttribute('aria-pressed', String(selected));
   }
 
-  for (const todo of filterTodos(todos, filter)) list.append(buildItem(todo));
+  for (const todo of sortTodos(filterTodos(todos, filter))) list.append(buildItem(todo));
   renderStatus();
 }
 
@@ -85,42 +94,64 @@ function renderStatus() {
   footer.hidden = todos.length === 0;
 }
 
+const current = (id) => todos.find((t) => t.id === id);
+
 function buildItem(todo) {
+  const { id } = todo;
   const li = document.createElement('li');
-  li.className = 'todo' + (todo.done ? ' done' : '');
-  li.dataset.id = todo.id;
+  li.dataset.id = id;
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
-  checkbox.checked = todo.done;
-  checkbox.setAttribute('aria-label', `Mark "${todo.title}" complete`);
-  checkbox.addEventListener('change', () => update(toggleTodo(todos, todo.id)));
+  checkbox.addEventListener('change', () =>
+    update(toggleTodo(todos, id), { id, selector: 'input[type=checkbox]' }));
 
   const label = document.createElement('span');
   label.className = 'title';
-  label.textContent = todo.title;
   label.tabIndex = 0;
   label.title = 'Double-click or press Enter to edit';
-  label.addEventListener('dblclick', () => startEditing(li, label, todo));
+  label.addEventListener('dblclick', () => startEditing(li, label, id));
   label.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === 'F2') {
       e.preventDefault();
-      startEditing(li, label, todo);
+      startEditing(li, label, id);
     }
   });
+
+  const star = document.createElement('button');
+  star.className = 'star';
+  star.type = 'button';
+  star.addEventListener('click', () => update(toggleStar(todos, id), { id, selector: '.star' }));
 
   const del = document.createElement('button');
   del.className = 'delete';
   del.type = 'button';
   del.textContent = 'Delete';
-  del.setAttribute('aria-label', `Delete "${todo.title}"`);
-  del.addEventListener('click', () => update(removeTodo(todos, todo.id)));
+  del.addEventListener('click', () => update(removeTodo(todos, id)));
 
-  li.append(checkbox, label, del);
+  li.append(checkbox, label, star, del);
+  refreshItem(li, todo);
   return li;
 }
 
-function startEditing(li, label, todo) {
+// Sync an existing row's elements with a todo, without replacing any of them.
+function refreshItem(li, todo) {
+  li.className = 'todo' + (todo.done ? ' done' : '');
+  const checkbox = li.querySelector('input[type=checkbox]');
+  checkbox.checked = todo.done;
+  checkbox.setAttribute('aria-label', `Mark "${todo.title}" complete`);
+  li.querySelector('.title').textContent = todo.title;
+  const star = li.querySelector('.star');
+  star.className = 'star' + (todo.starred ? ' starred' : '');
+  star.textContent = todo.starred ? '★' : '☆';
+  star.setAttribute('aria-pressed', String(!!todo.starred));
+  star.setAttribute('aria-label', `${todo.starred ? 'Unstar' : 'Star'} "${todo.title}"`);
+  li.querySelector('.delete').setAttribute('aria-label', `Delete "${todo.title}"`);
+}
+
+function startEditing(li, label, id) {
+  const todo = current(id);
+  if (!todo) return;
   const editor = document.createElement('input');
   editor.type = 'text';
   editor.className = 'edit';
@@ -132,16 +163,18 @@ function startEditing(li, label, todo) {
     if (finished) return;
     finished = true;
     if (commit) {
-      todos = renameTodo(todos, todo.id, editor.value);
+      todos = renameTodo(todos, id, editor.value);
       save(todos);
     }
-    // Patch only this row. A full re-render here would replace the element the
-    // user is clicking on when editing ends by clicking another row's control.
-    const updated = todos.find((t) => t.id === todo.id);
+    // Update this row in place. Editing often ends because the user clicked
+    // another control (this row's star, another row's checkbox). Replacing or
+    // re-rendering rows here would swap that control out from under the click.
+    const updated = current(id);
     if (updated) {
-      const row = buildItem(updated);
-      li.replaceWith(row);
-      if (restoreFocus) row.querySelector('.title').focus();
+      editor.replaceWith(label);
+      li.classList.remove('editing');
+      refreshItem(li, updated);
+      if (restoreFocus) label.focus();
     } else {
       li.remove();
     }
