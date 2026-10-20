@@ -129,6 +129,17 @@ body {
   text-decoration: line-through;
 }
 
+.todo .star {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.todo .star.starred { color: #b07000; } /* 4.07:1 on white */
+
 .todo .delete {
   border: 0;
   background: none;
