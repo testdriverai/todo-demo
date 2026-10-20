@@ -84,6 +84,7 @@ body {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 8px;
+  overflow: hidden; /* clip row hover backgrounds to the rounded corners */
 }
 
 .todo-list:empty { display: none; }
@@ -98,10 +99,20 @@ body {
 
 .todo:last-child { border-bottom: 0; }
 
+.todo:hover { background: #f8f9fc; }
+
 .todo .title {
   flex: 1;
   cursor: text;
   border-radius: 4px;
+}
+
+/* Keep long titles on one line; the full title shows on hover. */
+.todo .title .text {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .todo .title:focus-visible {

@@ -98,9 +98,13 @@ function buildItem(todo) {
 
   const label = document.createElement('span');
   label.className = 'title';
-  label.textContent = todo.title;
+  // Inner span so long titles can truncate to one line; full title on hover.
+  const text = document.createElement('span');
+  text.className = 'text';
+  text.textContent = todo.title;
+  text.title = todo.title;
+  label.append(text);
   label.tabIndex = 0;
-  label.title = 'Double-click or press Enter to edit';
   label.addEventListener('dblclick', () => startEditing(li, label, todo));
   label.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === 'F2') {
