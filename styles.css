@@ -23,15 +23,38 @@ body {
   padding: 0 16px;
 }
 
+.app-header {
+  position: relative;
+  margin-bottom: 16px;
+  padding: 24px 20px 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #eef2ff 0%, #ffffff 60%);
+}
+
+/* Soft accent glow behind the header content */
+.app-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 85% 0%, rgba(59, 91, 219, 0.12), transparent 55%);
+}
+
 .app-header h1 {
-  margin: 0 0 16px;
+  margin: 0;
   font-size: 32px;
+  letter-spacing: -0.02em;
+}
+
+.app-header .tagline {
+  margin: 4px 0 16px;
+  color: var(--muted);
 }
 
 .new-todo {
   display: flex;
   gap: 8px;
-  margin-bottom: 16px;
 }
 
 .new-todo input {
