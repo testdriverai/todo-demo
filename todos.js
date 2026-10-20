@@ -20,3 +20,11 @@ export function toggleTodo(todos, id) {
 export function removeTodo(todos, id) {
   return todos.filter((t) => t.id !== id);
 }
+
+export const FILTERS = ['all', 'active', 'completed'];
+
+export function filterTodos(todos, filter) {
+  if (filter === 'active') return todos.filter((t) => !t.done);
+  if (filter === 'completed') return todos.filter((t) => t.done);
+  return todos;
+}
