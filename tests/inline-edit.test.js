@@ -5,7 +5,7 @@ describe("Inline Todo Editing", () => {
   it("edits a todo title in place, preserves other row actions, and deletes on empty", async (context) => {
     const testdriver = TestDriver(context);
 
-    await testdriver.provision.chrome({ url: "https://insurance-distribute-swimming-letters.trycloudflare.com" });
+    await testdriver.provision.chrome({ url: process.env.TEST_URL || "http://localhost:3000" });
 
     // Add first todo
     await testdriver.find("What needs doing input field").click();
