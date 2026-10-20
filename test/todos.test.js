@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { addTodo, toggleTodo, removeTodo, filterTodos } from '../todos.js';
+import { addTodo, toggleTodo, removeTodo, filterTodos, countActive, clearCompleted } from '../todos.js';
 
 test('addTodo appends a trimmed todo', () => {
   const todos = addTodo([], '  buy milk  ');
@@ -32,4 +32,16 @@ test('filterTodos returns active, completed, or all todos', () => {
   assert.deepEqual(filterTodos(todos, 'active').map((t) => t.title), ['b']);
   assert.deepEqual(filterTodos(todos, 'completed').map((t) => t.title), ['a']);
   assert.equal(filterTodos(todos, 'all').length, 2);
+});
+
+test('countActive counts todos that are not done', () => {
+  let todos = addTodo(addTodo(addTodo([], 'a'), 'b'), 'c');
+  todos = toggleTodo(todos, todos[1].id);
+  assert.equal(countActive(todos), 2);
+});
+
+test('clearCompleted removes only done todos', () => {
+  let todos = addTodo(addTodo([], 'a'), 'b');
+  todos = toggleTodo(todos, todos[0].id);
+  assert.deepEqual(clearCompleted(todos).map((t) => t.title), ['b']);
 });
