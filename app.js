@@ -1,4 +1,12 @@
-import { addTodo, toggleTodo, removeTodo, filterTodos, FILTERS } from './todos.js';
+import {
+  addTodo,
+  toggleTodo,
+  removeTodo,
+  filterTodos,
+  FILTERS,
+  countActive,
+  clearCompleted,
+} from './todos.js';
 
 const STORAGE_KEY = 'todo-demo:todos';
 
@@ -26,6 +34,11 @@ const input = document.querySelector('#new-todo');
 const list = document.querySelector('#todo-list');
 const empty = document.querySelector('#empty-state');
 const filterButtons = document.querySelectorAll('.filters button');
+const footer = document.querySelector('#footer');
+const counter = document.querySelector('#items-left');
+const clearButton = document.querySelector('#clear-completed');
+
+clearButton.addEventListener('click', () => update(clearCompleted(todos)));
 
 const EMPTY_MESSAGES = {
   all: 'Nothing to do. Add your first todo above.',
@@ -83,6 +96,11 @@ function render() {
   }
   empty.textContent = EMPTY_MESSAGES[filter];
   empty.hidden = visible.length > 0;
+
+  const active = countActive(todos);
+  counter.textContent = `${active} ${active === 1 ? 'item' : 'items'} left`;
+  clearButton.hidden = active === todos.length;
+  footer.hidden = todos.length === 0;
 }
 
 form.addEventListener('submit', (e) => {

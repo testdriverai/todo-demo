@@ -113,6 +113,27 @@ body {
   cursor: pointer;
 }
 
+.app-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.app-footer[hidden],
+.app-footer button[hidden] { display: none; }
+
+.app-footer button {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .empty {
   color: var(--muted);
   text-align: center;

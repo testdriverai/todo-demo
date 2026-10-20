@@ -28,3 +28,11 @@ export function filterTodos(todos, filter) {
   if (filter === 'completed') return todos.filter((t) => t.done);
   return todos;
 }
+
+export function countActive(todos) {
+  return todos.filter((t) => !t.done).length;
+}
+
+export function clearCompleted(todos) {
+  return todos.filter((t) => !t.done);
+}
