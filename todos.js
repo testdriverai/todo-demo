@@ -36,3 +36,9 @@ export function countActive(todos) {
 export function clearCompleted(todos) {
   return todos.filter((t) => !t.done);
 }
+
+export function renameTodo(todos, id, title) {
+  const trimmed = String(title ?? '').trim();
+  if (!trimmed) return removeTodo(todos, id);
+  return todos.map((t) => (t.id === id ? { ...t, title: trimmed } : t));
+}
