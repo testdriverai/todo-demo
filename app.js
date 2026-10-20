@@ -1,4 +1,4 @@
-import { addTodo, toggleTodo, removeTodo } from './todos.js';
+import { addTodo, toggleTodo, removeTodo, filterTodos, FILTERS } from './todos.js';
 
 const STORAGE_KEY = 'todo-demo:todos';
 
@@ -19,11 +19,27 @@ function save(todos) {
 }
 
 let todos = load();
+let filter = 'all';
 
 const form = document.querySelector('#new-todo-form');
 const input = document.querySelector('#new-todo');
 const list = document.querySelector('#todo-list');
 const empty = document.querySelector('#empty-state');
+const filterButtons = document.querySelectorAll('.filters button');
+
+const EMPTY_MESSAGES = {
+  all: 'Nothing to do. Add your first todo above.',
+  active: 'All done. Nothing active right now.',
+  completed: 'Nothing completed yet.',
+};
+
+for (const button of filterButtons) {
+  button.addEventListener('click', () => {
+    if (!FILTERS.includes(button.dataset.filter)) return;
+    filter = button.dataset.filter;
+    render();
+  });
+}
 
 function update(next) {
   todos = next;
@@ -33,7 +49,14 @@ function update(next) {
 
 function render() {
   list.innerHTML = '';
-  for (const todo of todos) {
+  for (const button of filterButtons) {
+    const selected = button.dataset.filter === filter;
+    button.classList.toggle('selected', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  }
+
+  const visible = filterTodos(todos, filter);
+  for (const todo of visible) {
     const li = document.createElement('li');
     li.className = 'todo' + (todo.done ? ' done' : '');
     li.dataset.id = todo.id;
@@ -58,7 +81,8 @@ function render() {
     li.append(checkbox, label, del);
     list.append(li);
   }
-  empty.hidden = todos.length > 0;
+  empty.textContent = EMPTY_MESSAGES[filter];
+  empty.hidden = visible.length > 0;
 }
 
 form.addEventListener('submit', (e) => {
