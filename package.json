@@ -6,9 +6,15 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test"
+    "test": "node --test 'test/**/*.test.js'",
+    "test:testdriver": "vitest run"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "dotenv": "^18.0.8",
+    "testdriverai": "^7.11.171",
+    "vitest": "^5.0.5"
   }
 }
